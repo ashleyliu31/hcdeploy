@@ -25,7 +25,7 @@ SECRET_KEY = 'owf7$e3vsle(3cm=k!(qv9+q_u6#jnzq_4pfrn7%@do__pk+&_'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['http://humanitiescomplete.org/', "humanitiescomplete.org", "www.humanitiescomplete.org", "http://humanitiescomplete.org/", "humanitiescomplete.org", 'humanitiescomplete.org']
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
