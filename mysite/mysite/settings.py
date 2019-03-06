@@ -25,7 +25,7 @@ SECRET_KEY = 'owf7$e3vsle(3cm=k!(qv9+q_u6#jnzq_4pfrn7%@do__pk+&_'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['http://humanitiescomplete.org/', "humanitiescomplete.org", "www.humanitiescomplete.org", "http://humanitiescomplete.org/", "humanitiescomplete.org", 'humanitiescomplete.org']
 
 
 # Application definition
@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.postgres',
+    'storages',
 ]
 
 MIDDLEWARE = [
@@ -80,17 +81,28 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
-        'USER': 'postgres',
-        'PASSWORD': 'queenatobe',
-        'HOST': '',
-        'PORT': '5432',
+if 'RDS_DB_NAME' in os.environ:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': os.environ['RDS_DB_NAME'],
+            'USER': os.environ['RDS_USERNAME'],
+            'PASSWORD': os.environ['RDS_PASSWORD'],
+            'HOST': os.environ['RDS_HOSTNAME'],
+            'PORT': os.environ['RDS_PORT'],
+        }
     }
-}
-
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'articles',
+            'USER': 'ashley',
+            'PASSWORD': 'queenatobe',
+            'HOST': 'hcdatabase.cvikoyffier8.us-east-1.rds.amazonaws.com',
+            'PORT': '5432',
+        }
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
@@ -130,3 +142,24 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 STATIC_URL = '/static/'
+
+
+# AWS S3 SETTINGS
+AWS_LOCATION = 'static'
+AWS_ACCESS_KEY_ID ='AKIAJ4CZTCQJ2IDWXABQ' 
+AWS_SECRET_ACCESS_KEY = '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'
+AWS_STORAGE_BUCKET_NAME ='humanitiescompletestatic'
+AWS_S3_CUSTOM_DOMAIN='%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
+AWS_S3_OBJECT_PARAMETERS = {    
+     'CacheControl': 'max-age=86400',
+}
+DEFAULT_FILE_STORAGE = 'app.storage_backends.MediaStorage'
+STATICFILES_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+] 
+STATIC_URL='https://%s/%s/' % (AWS_S3_CUSTOM_DOMAIN, AWS_LOCATION)
+ADMIN_MEDIA_PREFIX = STATIC_URL + 'admin/'
+STATICFILES_FINDERS = (           'django.contrib.staticfiles.finders.FileSystemFinder',    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+)
+AWS_DEFAULT_ACL = None
